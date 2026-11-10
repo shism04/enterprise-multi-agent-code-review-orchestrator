@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Review Report</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px;
+      background: #f8f9fa;
+      color: #212529;
+    }
+    h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 12px; }
+    .summary {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin: 24px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .metric { text-align: center; }
+    .metric-value { font-size: 2em; font-weight: bold; color: #3498db; }
+    .metric-label { color: #6c757d; font-size: 0.9em; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 12px; margin: 8px 0; border-radius: 4px; background: white; }
+    .rec-critical { border-left: 4px solid #e74c3c; }
+    .rec-high { border-left: 4px solid #f39c12; }
+    .rec-medium { border-left: 4px solid #3498db; }
+    .rec-low { border-left: 4px solid #27ae60; }
+    .priority { font-weight: bold; margin-right: 8px; }
+    .rec-critical .priority { color: #e74c3c; }
+    .rec-high .priority { color: #f39c12; }
+    .rec-medium .priority { color: #3498db; }
+    .rec-low .priority { color: #27ae60; }
+    footer { text-align: center; color: #6c757d; margin-top: 32px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Code Review Report</h1>
+  
+  <div class="summary">
+    <div class="metric">
+      <div class="metric-value">0</div>
+      <div class="metric-label">Overall Score</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">1</div>
+      <div class="metric-label">Files Reviewed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">3</div>
+      <div class="metric-label">Critical Issues</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">4</div>
+      <div class="metric-label">Tests Needed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">4</div>
+      <div class="metric-label">Refactorings</div>
+    </div>
+  </div>
+
+  <h2>🎯 Top Recommendations</h2>
+  <ul>
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Security - SQL Injection</strong>: All three new search functions (searchTodos, searchTodosByStatus, getTodosByUser) use string concatenation or template literals to build SQL queries with unsanitized user input. This creates critical SQL injection vulnerabilities allowing attackers to read unauthorized data, bypass access controls, or execute destructive commands. IMMEDIATE ACTION REQUIRED: Replace all string concatenation with parameterized queries using the $1, $2 placeholder syntax supported by the db.query method.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Testing - Zero Coverage for Vulnerable Functions</strong>: The three new functions added in this PR have zero test coverage despite being explicitly marked as vulnerable to SQL injection. No tests verify that SQL injection payloads are rejected or that the functions behave correctly with malicious input. This is a critical gap that must be addressed before merging.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Type Safety</strong>: The searchTodosByStatus function accepts a string parameter but uses it as a boolean in SQL queries, creating type confusion and potential runtime errors. The parameter type should be changed to boolean to match the database schema and prevent invalid inputs.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Testing - Database Operations Untested</strong>: All async database operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) lack tests verifying their database interactions, parameterized query usage, error handling, and edge cases. This represents a significant testing gap for critical application functionality.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-medium">
+        <span class="priority">[MEDIUM]</span>
+        <strong>Error Handling</strong>: None of the three new search functions implement error handling for database failures. Errors will propagate uncaught to callers, potentially exposing internal implementation details or causing application crashes. Add try-catch blocks with sanitized error messages.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    </ul>
+
+  <footer>
+    Generated at 2026-11-07T16:28:54.014Z • Duration: 303418ms
+  </footer>
+</body>
+</html>
